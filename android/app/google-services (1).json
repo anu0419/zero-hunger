@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "920769887092",
+    "project_id": "zerohungerr-37d86",
+    "storage_bucket": "zerohungerr-37d86.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:920769887092:android:c1fbf1ca73537cf03c0a21",
+        "android_client_info": {
+          "package_name": "com.example.zerohungerr"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7vEKhr_XrbLf7JKl4xdy3972v-luvzEQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
