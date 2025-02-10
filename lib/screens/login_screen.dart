@@ -23,7 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  String _selectedRole = 'Farmer';
+  
   bool _isLoading = false;
   bool isPasswordHidden = true;
 
@@ -68,9 +68,9 @@ class _LoginScreenState extends State<LoginScreen> {
   void navigateToDashboard(String uid) async {
     String? role = await authService.getUserRole(uid);
     if (role == "Farmer") {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => FarmerDashboard()));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => FarmerDashboard(farmerId: "your_farmer_id")));
     } else if (role == "Manufacturer") {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ManufacturerDashboard()));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ManufacturerDashboard(manufacturerId: "your_manufacturer_id")));
     } else if (role == "Distributor") {
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => DistributorDashboard()));
     } else if (role == "Retailer") {
