@@ -8,11 +8,7 @@ class RetailerDashboard extends StatefulWidget {
 }
 
 class _RetailerDashboardState extends State<RetailerDashboard> {
-  @override
-  void initState() {
-    super.initState();
-    checkAndExpireContracts(); // ✅ Call function on startup
-  }
+ 
 
   void checkAndExpireContracts() async {
     QuerySnapshot contracts = await FirebaseFirestore.instance.collection('contracts').get();
@@ -122,15 +118,7 @@ class _RetailerDashboardState extends State<RetailerDashboard> {
                             child: Text("Reject"),
                           ),
 
-                            SizedBox(height: 5),
-                             // ✅ Added Terminate Button based on contract status
-                             contract['status'] == "Active"
-                              ? ElevatedButton(
-                                  onPressed: () => terminateContract(contract.id),
-                                  child: Text("Terminate Contract"),
-                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                                )
-                              : Text("❌ Contract ${contract['status']}", style: TextStyle(color: Colors.red)),
+                          
                         ],
                       ),
                     ],

@@ -105,15 +105,7 @@ class _AddContractScreenState extends State<AddContractScreen> {
     Navigator.pop(context); // Go back to dashboard after saving
   }
 
-  void finalizeContract(String contractId) {
-  DateTime expiryDate = DateTime.now().add(Duration(days: 7)); // Expires in 7 days
-
-  FirebaseFirestore.instance.collection('contracts').doc(contractId).update({
-    'status': 'Active',
-    'expiryDate': expiryDate.toIso8601String(),
-  });
-}
-
+ 
 
   @override
   Widget build(BuildContext context) {

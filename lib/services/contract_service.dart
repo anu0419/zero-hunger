@@ -65,19 +65,3 @@ class ContractService {
   }
 }
 
-// ✅ Check and Expire Contracts
-  Future<void> checkAndExpireContracts() async {
-    QuerySnapshot contracts = await FirebaseFirestore.instance.collection('contracts').get();
-
-    for (var doc in contracts.docs) {
-      var contract = doc.data() as Map<String, dynamic>;
-      if (contract['expiryDate'] != null) {
-        DateTime expiryDate = DateTime.parse(contract['expiryDate']);
-        if (expiryDate.isBefore(DateTime.now())) {
-          FirebaseFirestore.instance.collection('contracts').doc(doc.id).update({
-            'status': 'Expired',
-          });
-        }
-      }
-    }
-  }

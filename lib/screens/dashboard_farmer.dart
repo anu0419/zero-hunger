@@ -23,16 +23,7 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
     });
   }
 
-  void terminateContract(String contractId) {
-  FirebaseFirestore.instance.collection('contracts').doc(contractId).update({
-    'status': 'Terminated',
-  }).then((_) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Contract Terminated!")),
-    );
-  });
-}
-
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -123,16 +114,6 @@ class _FarmerDashboardState extends State<FarmerDashboard> {
                                     onPressed: () => signContract(contract.id),
                                     child: Text("Sign Contract"),
                                   ),
-
-                             SizedBox(height: 5),
-                             // ✅ Added Terminate Button based on contract status
-                             contract['status'] == "Active"
-                              ? ElevatedButton(
-                                  onPressed: () => terminateContract(contract.id),
-                                  child: Text("Terminate Contract"),
-                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                                )
-                              : Text("❌ Contract ${contract['status']}", style: TextStyle(color: Colors.red)),
                           ],
                         ),
                       ),
