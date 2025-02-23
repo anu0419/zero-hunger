@@ -1,0 +1,1 @@
+Zero Hunger is a revolutionary application that aims to bridge the gap in the supply chain between suppliers and consumers.

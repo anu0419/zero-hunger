@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="zerohungerr">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>zerohungerr</title>
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Mapbox Integration -->
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css" rel="stylesheet" />
+
+  <style>
+      body { margin: 0; padding: 0; }
+      #map { width: 100%; height: 500px; } /* Adjust height as needed */
+  </style>
+</head>
+<body>
+
+  <div id="map"></div> <!-- Map Container -->
+
+  <script src="flutter_bootstrap.js" async></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7vEKhr_XrbLf7JKl4xdy3972v-luvzEQ"></script>
+
+  <script>
+      mapboxgl.accessToken = 'pk.eyJ1IjoibWl0cmFhIiwiYSI6ImNtNzRyd2ZpeTBkbnQyaXF5MW5lN2V5c24ifQ.tGjnKGB8IoMH-ziaa9rGQg';
+
+      const map = new mapboxgl.Map({
+          container: 'map',
+          style: 'mapbox://styles/mapbox/streets-v11',
+          center: [80.2134, 13.0500], // Centered on Vadapalani, Chennai
+          zoom: 12
+      });
+
+      const foodShelters = [
+          { name: "MRD Social Services", coords: [80.2123, 13.0524] },
+          { name: "Amma Unavagam (Vadapalani)", coords: [80.2123, 13.0524] },
+          { name: "Greater Chennai Corporation Night Shelter", coords: [80.2130, 13.0540] },
+          { name: "Food Bank - Chennai", coords: [80.2145, 13.0562] },
+          { name: "Public Distribution System (PDS) - Vadapalani", coords: [80.2152, 13.0580] }
+      ];
+
+      foodShelters.forEach(shelter => {
+          new mapboxgl.Marker()
+              .setLngLat(shelter.coords)
+              .setPopup(new mapboxgl.Popup().setText(shelter.name))
+              .addTo(map);
+      });
+  </script>
+
+</body>
+</html>
