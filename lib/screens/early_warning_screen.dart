@@ -10,15 +10,18 @@ class EarlyWarningScreen extends StatefulWidget {
 class _EarlyWarningScreenState extends State<EarlyWarningScreen> {
   final _warningService = EarlyWarningService();
   String _riskMessage = "Enter data to check risk level";
+  String _weatherAlert = "No alerts";
   bool _isLoading = false;
 
   final TextEditingController _tempController = TextEditingController();
   final TextEditingController _humidityController = TextEditingController();
+  final TextEditingController _latController = TextEditingController();
+  final TextEditingController _lonController = TextEditingController();
 
   void _checkRisk() async {
-    if (_tempController.text.isEmpty || _humidityController.text.isEmpty) {
+    if (_tempController.text.isEmpty || _humidityController.text.isEmpty || _latController.text.isEmpty || _lonController.text.isEmpty) {
       setState(() {
-        _riskMessage = "Please enter both temperature and humidity";
+        _riskMessage = "Please enter all required data";
       });
       return;
     }
@@ -31,11 +34,14 @@ class _EarlyWarningScreenState extends State<EarlyWarningScreen> {
     try {
       double temperature = double.parse(_tempController.text);
       double humidity = double.parse(_humidityController.text);
+      double latitude = double.parse(_latController.text);
+      double longitude = double.parse(_lonController.text);
 
-      String risk = await _warningService.getRiskLevel(temperature, humidity);
+      var result = await _warningService.getRiskLevel(temperature, humidity, latitude, longitude);
 
       setState(() {
-        _riskMessage = "Risk Level: $risk";
+        _riskMessage = "Risk Level: ${result['risk'] ?? 'Unknown'}";
+        _weatherAlert = result['weather_alert'] ?? "No weather alerts";
         _isLoading = false;
       });
     } catch (e) {
@@ -56,19 +62,25 @@ class _EarlyWarningScreenState extends State<EarlyWarningScreen> {
           children: [
             TextField(
               controller: _tempController,
-              decoration: InputDecoration(
-                labelText: "Temperature (°C)",
-                hintText: "Enter temperature",
-              ),
+              decoration: InputDecoration(labelText: "Temperature (°C)", hintText: "Enter temperature"),
               keyboardType: TextInputType.number,
             ),
             SizedBox(height: 10),
             TextField(
               controller: _humidityController,
-              decoration: InputDecoration(
-                labelText: "Humidity (%)",
-                hintText: "Enter humidity",
-              ),
+              decoration: InputDecoration(labelText: "Humidity (%)", hintText: "Enter humidity"),
+              keyboardType: TextInputType.number,
+            ),
+            SizedBox(height: 10),
+            TextField(
+              controller: _latController,
+              decoration: InputDecoration(labelText: "Latitude", hintText: "Enter latitude"),
+              keyboardType: TextInputType.number,
+            ),
+            SizedBox(height: 10),
+            TextField(
+              controller: _lonController,
+              decoration: InputDecoration(labelText: "Longitude", hintText: "Enter longitude"),
               keyboardType: TextInputType.number,
             ),
             SizedBox(height: 20),
@@ -87,9 +99,17 @@ class _EarlyWarningScreenState extends State<EarlyWarningScreen> {
                 color: _riskMessage.contains("Error") ? Colors.red : Colors.black,
               ),
             ),
+            SizedBox(height: 10),
+            Text(
+              "🌍 $_weatherAlert",
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.red,
+              ),
+            ),
           ],
         ),
       ),
     );
   }
-}
+}

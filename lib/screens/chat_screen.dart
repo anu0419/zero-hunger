@@ -19,18 +19,26 @@ class _ChatScreenState extends State<ChatScreen> {
   void _sendMessage() async {
     String messageText = _messageController.text.trim();
     if (messageText.isNotEmpty) {
-      await _firestore.collection('chats').add({
-        'senderId': _auth.currentUser!.uid,
-        'receiverId': widget.receiverId,
-        'message': messageText,
-        'timestamp': FieldValue.serverTimestamp(),
-      });
-      _messageController.clear();
+      try {
+        await _firestore.collection('chats').add({
+          'senderId': _auth.currentUser!.uid,
+          'receiverId': widget.receiverId,
+          'message': messageText,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+        _messageController.clear();
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to send message: ${e.toString()}')),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final currentUserId = _auth.currentUser!.uid;
+    
     return Scaffold(
       appBar: AppBar(title: Text("Chat with ${widget.receiverName}")),
       body: Column(
@@ -39,11 +47,9 @@ class _ChatScreenState extends State<ChatScreen> {
             child: StreamBuilder<QuerySnapshot>(
               stream: _firestore
                   .collection('chats')
-                  .where('senderId', whereIn: [_auth.currentUser!.uid, widget.receiverId])
-                  .where('receiverId', whereIn: [_auth.currentUser!.uid, widget.receiverId])
                   .orderBy('timestamp', descending: true)
                   .snapshots(),
-              builder: (context, snapshot) {
+              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 }
@@ -52,8 +58,15 @@ class _ChatScreenState extends State<ChatScreen> {
                   return Center(child: CircularProgressIndicator());
                 }
 
-                var messages = snapshot.data!.docs;
-                
+                // Filter messages for this chat
+                var messages = snapshot.data!.docs.where((doc) {
+                  final data = doc.data() as Map<String, dynamic>;
+                  return (data['senderId'] == currentUserId && 
+                          data['receiverId'] == widget.receiverId) ||
+                         (data['senderId'] == widget.receiverId && 
+                          data['receiverId'] == currentUserId);
+                }).toList();
+
                 if (messages.isEmpty) {
                   return Center(child: Text('No messages yet'));
                 }
@@ -62,8 +75,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   reverse: true,
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
-                    var msg = messages[index].data() as Map<String, dynamic>;
-                    bool isMe = msg['senderId'] == _auth.currentUser!.uid;
+                    var messageData = messages[index].data() as Map<String, dynamic>;
+                    bool isMe = messageData['senderId'] == currentUserId;
 
                     return Align(
                       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
@@ -72,10 +85,18 @@ class _ChatScreenState extends State<ChatScreen> {
                         margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                         decoration: BoxDecoration(
                           color: isMe ? Colors.blue[100] : Colors.grey[300],
-                          borderRadius: BorderRadius.circular(15),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(15),
+                            topRight: Radius.circular(15),
+                            bottomLeft: isMe ? Radius.circular(15) : Radius.circular(5),
+                            bottomRight: isMe ? Radius.circular(5) : Radius.circular(15),
+                          ),
+                        ),
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.7,
                         ),
                         child: Text(
-                          msg['message'] ?? '',
+                          messageData['message'] ?? '',
                           style: TextStyle(
                             color: Colors.black87,
                             fontSize: 16,
@@ -112,6 +133,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                       contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     ),
+                    onSubmitted: (_) => _sendMessage(),
                   ),
                 ),
                 SizedBox(width: 8),
@@ -132,4 +154,4 @@ class _ChatScreenState extends State<ChatScreen> {
     _messageController.dispose();
     super.dispose();
   }
-}
+}
